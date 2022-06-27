@@ -72,7 +72,7 @@ First, add your Workload user/pass to the “user” and “password” fields.
  
 Next, add the “host” field in the template we noted earlier from cdp ui step 5.[cloudera-spark](#create-cloudera-data-hub-spark-account)
 
-For our case we created a sample dbt project using `dbt init` called spark_test
+For our case we created a sample dbt project using `dbt init` called spark_test. If asked for details that you are unsure go with defaults as we will anyway be updating the profile file for connection latter.
 
 My completed profile looks like this:
 ```
