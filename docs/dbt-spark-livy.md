@@ -31,18 +31,78 @@ The steps for this are documented here:
 
 With the user created & the workload password set, take a note of the Workload username & password. Notice in the below screenshot, for a Machine User called ‘cia_test_user’ the workload username is ‘srv_cia_test_user’. 
 
-![userimage](https://community.cloudera.com/t5/image/serverpage/image-id/34286iE85E825F1278E53D/image-size/medium?v=v2&px=400)
+![userimage](https://github.com/TapasSenapati/dbt-spark-livy/blob/main/docs/alex_wood_0-1651165263767.png?raw=true)
 
 Keep the workload user & password details handy for later.
 
-#### **Cloudera Data HUB Spark**
+--------
+
+#### **Cloudera Data HUB Spark account**
 
 1. Start by activating your CDW Environment as documented [here](https://docs.cloudera.com/data-warehouse/cloud/aws-environments/topics/dw-activating-environments-4-data-catalogs.html).
 2. This will create a default database catalog, which we will use in this demo. You are able to create non-default database catalogs, as documented [here](https://docs.cloudera.com/data-warehouse/cloud/managing-warehouses/topics/dw-adding-new-database-catalog.html).
-3. Next, create a datahub as documented [here](https://www.cloudera.com/tutorials/cdp-how-to-create-a-data-hub.html). Choose a cluster that provides spark . For our our use case we went with 7.2.14 - Data Engineering: Apache Spark3
+3. Next, create a datahub as documented [here](https://www.cloudera.com/tutorials/cdp-how-to-create-a-data-hub.html). Choose a cluster that provides spark . For our our use case we went with 7.2.14 - Data Engineering: Apache Spark3. Once up and running you should have a data hub similar to below
+![datahubimage](https://github.com/TapasSenapati/dbt-spark-livy/blob/main/docs/datahub.png?raw=true)
+4. With the datahub in running state you can view the details of the datahub by clicking on it. The livy server UI and other relevant addresses are also accessible from the same page.
+![spark3](https://github.com/TapasSenapati/dbt-spark-livy/blob/main/docs/datahub_spark3.png?raw=true)
    
+-------
+#### **Connecting dbt to Spark**
 
+dbt requires that we configure a profile that defines how to connect to our data warehouse. For this, we need the workload credentials & Impala connection details we collected earlier.
 
+ 
+The profile lives in a `.dbt` directory in your home directory and is called `profiles.yml`. On Linux, this would look like `~/.dbt/profiles.yml`. If you haven't used dbt before, create the directory with `mkdir ~/.dbt` and create the `profiles.yml` file with your favourite text editor.
+
+You can learn more about the dbt profile from the dbt docs [here](https://docs.getdbt.com/dbt-cli/configure-your-profile)
+
+Use the following template for the contents of the file:
+
+```
+dbt_spark_demo:
+  outputs:
+    dev:
+     type: impala
+     host: <Spark Hostname>
+     schema: dbt_demo
+     user: <Workload Username>
+     password: <Workload Password>
+     http_path: cliservice
+``` 
+
+First, add your Workload user/pass to the “user” and “password” fields.
+ 
+Next, add the “host” field in the template from cdp ui.
+
+My completed profile looks like this:
+```
+demo_project:
+  target: dev
+  outputs:
+    dev:
+     type: spark
+     method: livy
+     schema: my_db
+     host: https://dbt-spark-gateway.ciadev.cna2-sx9y.cloudera.site/dbt-spark/cdp-proxy/livy_for_spark3
+     user: srv_cia_test_user
+     password: Password123!
+```
+
+To ensure we’ve configured our profile correctly, let’s run a connection test. For this we use the command:
+dbt debug
+ 
+In the output of this command, you should see the following:
+
+Connection:
+  host: coordinator-cia-dbt-impala.dw-ciadev.a465-9q4k.cloudera.site
+  port: 443
+  database: dbt_demo
+  schema: dbt_demo
+  username: srv_cia_test_user
+  Connection test: [OK connection ok]
+ 
+
+This confirms a successful connection to the Impala warehouse.
 
 
 
