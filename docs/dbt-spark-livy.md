@@ -51,7 +51,7 @@ Keep the **workload user & password** details handy for later.
 ![endpoint](https://github.com/TapasSenapati/dbt-spark-livy/blob/main/docs/endpoint.png?raw=true) 
 
 -------
-#### **Connecting dbt to Spark**
+#### **Connecting dbt to Spark-Livy**
 
 dbt requires that we configure a profile that defines how to connect to our data warehouse. For this, we need the workload credentials & connection details we collected earlier.
 
@@ -71,6 +71,8 @@ Use the following template for the contents of the file:
 First, add your Workload user/pass to the “user” and “password” fields.
  
 Next, add the “host” field in the template we noted earlier from cdp ui step 5.[cloudera-spark](#create-cloudera-data-hub-spark-account)
+
+For our case we created a sample dbt project using `dbt init` called spark_test
 
 My completed profile looks like this:
 ```
