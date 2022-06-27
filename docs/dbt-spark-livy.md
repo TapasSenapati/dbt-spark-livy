@@ -97,6 +97,18 @@ All checks passed similar to this.
 
 This confirms a successful connection to the server.
 
+----------
 
+#### **Version Notes:**
+
+The adpater has been tested on the following version.
+
+- DBT Core 1.1.1
+- spark_livy: 1.1.0 
+- python version: 3.9.13
+- Cloudera Manager CM VERSION 7.6.2 RUNTIME VERSION 7.2.15
+
+All other dependencies will be pulled in while installing [requirements.](#installing-requirements)
+  
 
 
