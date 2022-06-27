@@ -12,6 +12,8 @@ Install the requirements using pip/pip3:
 
 ``pip install dbt-spark-livy``
 
+Install dbt by referring to [Install-dbt](https://docs.getdbt.com/docs/installation)
+
 ------
 
 ### **Setup CDP**
@@ -33,11 +35,11 @@ With the user created & the workload password set, take a note of the Workload u
 
 ![userimage](https://github.com/TapasSenapati/dbt-spark-livy/blob/main/docs/alex_wood_0-1651165263767.png?raw=true)
 
-Keep the workload user & password details handy for later.
+Keep the **workload user & password** details handy for later.
 
 --------
 
-#### **Cloudera Data HUB Spark account**
+#### **Create Cloudera Data HUB Spark account**
 
 1. Start by activating your CDW Environment as documented [here](https://docs.cloudera.com/data-warehouse/cloud/aws-environments/topics/dw-activating-environments-4-data-catalogs.html).
 2. This will create a default database catalog, which we will use in this demo. You are able to create non-default database catalogs, as documented [here](https://docs.cloudera.com/data-warehouse/cloud/managing-warehouses/topics/dw-adding-new-database-catalog.html).
@@ -45,13 +47,15 @@ Keep the workload user & password details handy for later.
 ![datahubimage](https://github.com/TapasSenapati/dbt-spark-livy/blob/main/docs/datahub.png?raw=true)
 4. With the datahub in running state you can view the details of the datahub by clicking on it. The livy server UI and other relevant addresses are also accessible from the same page.
 ![spark3](https://github.com/TapasSenapati/dbt-spark-livy/blob/main/docs/datahub_spark3.png?raw=true)
-   
+5. Go to endpoints and note down the livy server 3 endpoint.This is the endpoint dbt will be connecting to.**Note this down**.
+![endpoint](https://github.com/TapasSenapati/dbt-spark-livy/blob/main/docs/endpoint.png?raw=true) 
+
 -------
 #### **Connecting dbt to Spark**
 
 dbt requires that we configure a profile that defines how to connect to our data warehouse. For this, we need the workload credentials & connection details we collected earlier.
 
-First lets do a quick check to see if connections are succesful. Open terminal and run command
+First lets do a quick check to see if connections are succesful. Open terminal and run command.
 
 ```
 curl -u 'srv_cia_test_user':'Password123!' -v -X POST --data '{"kind": "spark"}' -H "Content-Type: application/json" -k https://dbt-spark-gateway.ciadev.cna2-sx9y.cloudera.site/dbt-spark/cdp-proxy-api/livy_for_spark3/sessions
@@ -64,51 +68,34 @@ You can learn more about the dbt profile from the dbt docs [here](https://docs.g
 
 Use the following template for the contents of the file:
 
-```
-dbt_spark_demo:
-  outputs:
-    dev:
-     type: impala
-     host: <Spark Hostname>
-     schema: dbt_demo
-     user: <Workload Username>
-     password: <Workload Password>
-     http_path: cliservice
-``` 
-
 First, add your Workload user/pass to the “user” and “password” fields.
  
-Next, add the “host” field in the template from cdp ui.
+Next, add the “host” field in the template we noted earlier from cdp ui step 5.[cloudera-spark](#create-cloudera-data-hub-spark-account)
 
 My completed profile looks like this:
 ```
-demo_project:
-  target: dev
+spark_test:
   outputs:
     dev:
-     type: spark
-     method: livy
-     schema: my_db
-     host: https://dbt-spark-gateway.ciadev.cna2-sx9y.cloudera.site/dbt-spark/cdp-proxy/livy_for_spark3
-     user: srv_cia_test_user
-     password: Password123!
+      host: https://dbt-spark-gateway.ciadev.cna2-sx9y.cloudera.site/dbt-spark/cdp-proxy-api/livy_for_spark3
+      method: livy
+      schema: testdbt
+      threads: 1
+      type: spark_livy
+      password: Password123!
+      user: srv_cia_test_user
+  target: dev
 ```
 
-To ensure we’ve configured our profile correctly, let’s run a connection test. For this we use the command:
+To ensure we’ve configured our profile correctly, let’s run a connection test. For this inside of dbt folder spark_test we use the command:
+
 dbt debug
- 
+
 In the output of this command, you should see the following:
+All checks passed similar to this. 
+![dbt_debug](https://github.com/TapasSenapati/dbt-spark-livy/blob/main/docs/dbt_debug.png?raw=true) 
 
-Connection:
-  host: coordinator-cia-dbt-impala.dw-ciadev.a465-9q4k.cloudera.site
-  port: 443
-  database: dbt_demo
-  schema: dbt_demo
-  username: srv_cia_test_user
-  Connection test: [OK connection ok]
- 
-
-This confirms a successful connection to the Impala warehouse.
+This confirms a successful connection to the server.
 
 
 
