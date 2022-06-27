@@ -49,8 +49,14 @@ Keep the workload user & password details handy for later.
 -------
 #### **Connecting dbt to Spark**
 
-dbt requires that we configure a profile that defines how to connect to our data warehouse. For this, we need the workload credentials & Impala connection details we collected earlier.
+dbt requires that we configure a profile that defines how to connect to our data warehouse. For this, we need the workload credentials & connection details we collected earlier.
 
+First lets do a quick check to see if connections are succesful. Open terminal and run command
+
+```
+curl -u 'srv_cia_test_user':'Password123!' -v -X POST --data '{"kind": "spark"}' -H "Content-Type: application/json" -k https://dbt-spark-gateway.ciadev.cna2-sx9y.cloudera.site/dbt-spark/cdp-proxy-api/livy_for_spark3/sessions
+```
+Change the username password and hostname with your details. You should get a response Connection #0 to host left intact and see a new idle session being generated on the livy for spark3 ui.
  
 The profile lives in a `.dbt` directory in your home directory and is called `profiles.yml`. On Linux, this would look like `~/.dbt/profiles.yml`. If you haven't used dbt before, create the directory with `mkdir ~/.dbt` and create the `profiles.yml` file with your favourite text editor.
 
